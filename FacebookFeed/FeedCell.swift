@@ -13,6 +13,8 @@ var imageCache = NSCache()
 
 class FeedCell: UICollectionViewCell {
     
+   
+    
     var post: Post? {
         didSet {
             
@@ -144,7 +146,7 @@ class FeedCell: UICollectionViewCell {
         imageView.image = UIImage(named: "")
         imageView.contentMode = .ScaleAspectFill
         imageView.layer.masksToBounds = true
-        
+        imageView.userInteractionEnabled = true
         return imageView
     }()
     
@@ -191,6 +193,15 @@ class FeedCell: UICollectionViewCell {
         return button
     }
     
+   
+        
+   var feedController : FeedController?
+   
+   func animate(){
+       feedController?.animateImageView(statusImageView)
+   }
+   
+    
     
     
     func setupViews(){
@@ -206,6 +217,9 @@ class FeedCell: UICollectionViewCell {
         addSubview(likeButton)
         addSubview(commentButton)
         addSubview(shareButton)
+        
+        statusImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.animate)))
+        
         
         setupStatusImageViewLoader()
         

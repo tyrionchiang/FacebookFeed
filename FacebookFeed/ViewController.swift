@@ -47,6 +47,7 @@ class FeedController: UICollectionViewController, UICollectionViewDelegateFlowLa
         let feedCell = collectionView.dequeueReusableCellWithReuseIdentifier(CellId, forIndexPath: indexPath) as! FeedCell
         
         feedCell.post = posts[indexPath]
+        feedCell.feedController = self
         
         return feedCell
     }
@@ -71,5 +72,103 @@ class FeedController: UICollectionViewController, UICollectionViewDelegateFlowLa
         
         collectionView?.collectionViewLayout.invalidateLayout()
     }
+    
+    let zoomImageView = UIImageView()
+
+    let blackBackgroundView = UIView()
+    
+    var statusImageView: UIImageView?
+    
+    let navBarCoverView = UIView()
+    
+    let tabBarCoverView = UIView()
+    
+    
+    func animateImageView(statusImageView: UIImageView){
+        
+        self.statusImageView = statusImageView
+        
+        if let startingFram = statusImageView.superview?.convertRect(statusImageView.frame, toView: nil){
+            
+            statusImageView.alpha = 0
+            
+            blackBackgroundView.frame = self.view.frame
+            blackBackgroundView.backgroundColor = UIColor.blackColor()
+            blackBackgroundView.alpha = 0
+            view.addSubview(blackBackgroundView)
+            
+            
+            navBarCoverView.frame = CGRectMake(0, 0, 1000, 20 + 44)
+            navBarCoverView.backgroundColor = UIColor.blackColor()
+            navBarCoverView.alpha = 0
+            
+            
+            if let keyWindow = UIApplication.sharedApplication().keyWindow{
+                keyWindow.addSubview(navBarCoverView)
+                
+                tabBarCoverView.frame = CGRectMake(0, keyWindow.frame.height - 49, 1000, 49)
+                tabBarCoverView.backgroundColor = UIColor.blackColor()
+                tabBarCoverView.alpha = 0
+                keyWindow.addSubview(tabBarCoverView)
+
+            }
+            
+            
+            zoomImageView.backgroundColor = UIColor.redColor()
+            zoomImageView.frame = startingFram
+            zoomImageView.userInteractionEnabled = true
+            zoomImageView.image = statusImageView.image
+            zoomImageView.contentMode = .ScaleAspectFill
+            zoomImageView.clipsToBounds = true
+            view.addSubview(zoomImageView)
+            
+            zoomImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.zoomOut)))
+            
+            
+            UIView.animateWithDuration(0.75, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .CurveEaseOut, animations: {() -> Void in
+                let height = startingFram.height * self.view.frame.width / startingFram.width
+                let y = ((self.view.frame.height - height) / 2 + 49)
+                self.zoomImageView.frame = CGRectMake(0, y, self.view.frame.width, height)
+                
+                self.blackBackgroundView.alpha = 1
+                
+                self.navBarCoverView.alpha = 1
+                
+                self.tabBarCoverView.alpha = 1
+
+                }, completion: nil)
+            
+            
+            
+
+        }
+        
+
+    }
+    
+    func zoomOut(){
+        if let startingFram = statusImageView!.superview?.convertRect(statusImageView!.frame, toView: nil){
+            
+            
+            
+            UIView.animateWithDuration(0.75, animations: {() -> Void in
+                self.zoomImageView.frame = startingFram
+                
+                self.blackBackgroundView.alpha = 0
+                self.navBarCoverView.alpha = 0
+                self.tabBarCoverView.alpha = 0
+
+                }, completion: {(didComplete) -> Void in
+                    self.zoomImageView.removeFromSuperview()
+                    self.blackBackgroundView.removeFromSuperview()
+                    self.navBarCoverView.removeFromSuperview()
+                    self.tabBarCoverView.removeFromSuperview()
+                    self.statusImageView?.alpha = 1
+            })
+        
+        }
+        
+    }
+    
 }
 

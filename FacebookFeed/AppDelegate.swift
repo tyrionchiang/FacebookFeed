@@ -18,13 +18,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         window = UIWindow(frame: UIScreen.mainScreen().bounds)
         window?.makeKeyAndVisible()
+      
         
-        let feedController = FeedController(collectionViewLayout: UICollectionViewFlowLayout())
-        let navigationController = UINavigationController(rootViewController: feedController)
-        window?.rootViewController = navigationController
+        window?.rootViewController = CustomTabBarController()
         
         UINavigationBar.appearance().barTintColor = UIColor(red: 58/255, green: 88/255, blue: 151/255, alpha: 1.0)
         UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor()]
+        
+        UITabBar.appearance().tintColor = UIColor.rgb(78, green: 146, blue: 250)
         
         application.statusBarStyle = .LightContent
         
