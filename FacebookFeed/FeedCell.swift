@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-var imageCache = NSCache()
+var imageCache = NSCache<AnyObject, AnyObject>()
 
 class FeedCell: UICollectionViewCell {
     
@@ -23,23 +23,23 @@ class FeedCell: UICollectionViewCell {
             
             if let statusImageUrl = post?.statusImageUrl {
                 
-                if let image = imageCache.objectForKey(statusImageUrl) as? UIImage {
+                if let image = imageCache.object(forKey: statusImageUrl as AnyObject) as? UIImage {
                     statusImageView.image = image
                     loader.stopAnimating()
                 } else {
                     
-                    NSURLSession.sharedSession().dataTaskWithURL(NSURL(string: statusImageUrl)!, completionHandler: { (data, response, error) -> Void in
+                    URLSession.shared.dataTask(with: URL(string: statusImageUrl)!, completionHandler: { (data, response, error) -> Void in
                         
                         if error != nil {
-                            print(error)
+                            print(error!)
                             return
                         }
                         
                         let image = UIImage(data: data!)
                         
-                        imageCache.setObject(image!, forKey: statusImageUrl)
+                        imageCache.setObject(image!, forKey: statusImageUrl as AnyObject)
                         
-                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        DispatchQueue.main.async(execute: { () -> Void in
                             self.statusImageView.image = image
                             self.loader.stopAnimating()
                         })
@@ -56,12 +56,12 @@ class FeedCell: UICollectionViewCell {
         }
     }
     
-    private func setupNameLocationStatusAndProfileImage(){
+    fileprivate func setupNameLocationStatusAndProfileImage(){
         if let name = post?.name{
-            let attributedText = NSMutableAttributedString(string: name, attributes: [NSFontAttributeName:UIFont.boldSystemFontOfSize(14)])
+            let attributedText = NSMutableAttributedString(string: name, attributes: [NSFontAttributeName:UIFont.boldSystemFont(ofSize: 14)])
             
             let postTime = post?.postTime ?? "7 hrs"
-            attributedText.appendAttributedString(NSAttributedString(string: "\n\(postTime)  •  ", attributes: [NSFontAttributeName:UIFont.boldSystemFontOfSize(12), NSForegroundColorAttributeName: UIColor.rgb(155, green: 161, blue: 161)]))
+            attributedText.append(NSAttributedString(string: "\n\(postTime)  •  ", attributes: [NSFontAttributeName:UIFont.boldSystemFont(ofSize: 12), NSForegroundColorAttributeName: UIColor.rgb(155, green: 161, blue: 161)]))
             
             let paragraphStyle = NSMutableParagraphStyle()
             paragraphStyle.lineSpacing = 4
@@ -70,8 +70,8 @@ class FeedCell: UICollectionViewCell {
             
             let attachment = NSTextAttachment()
             attachment.image = UIImage(named: "globe_small")
-            attachment.bounds = CGRectMake(0, -2, 12, 12)
-            attributedText.appendAttributedString(NSAttributedString(attachment: attachment))
+            attachment.bounds = CGRect(x: 0, y: -2, width: 12, height: 12)
+            attributedText.append(NSAttributedString(attachment: attachment))
             
             nameLabel.attributedText = attributedText
             
@@ -92,7 +92,7 @@ class FeedCell: UICollectionViewCell {
                 likesLabel.text = "\(String.countLabelNumToString(numLikes)) Likes"
             }
         }
-        if let numComments = post?.numComments, numShares = post?.numShares{
+        if let numComments = post?.numComments, let numShares = post?.numShares{
             if (numShares != 0) && (numComments != 0){
                 commentSharesLabel.text = "\(String.countLabelNumToString(numComments)) comments  \(String.countLabelNumToString(numShares)) shards"
             }else if (numShares != 0) || (numComments != 0){
@@ -127,7 +127,7 @@ class FeedCell: UICollectionViewCell {
     let profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "")
-        imageView.contentMode = .ScaleAspectFit
+        imageView.contentMode = .scaleAspectFit
         
         return imageView
     }()
@@ -135,8 +135,8 @@ class FeedCell: UICollectionViewCell {
     let statusTextView : UITextView = {
         let textView = UITextView()
         textView.text = ""
-        textView.font = UIFont.systemFontOfSize(14)
-        textView.scrollEnabled = false
+        textView.font = UIFont.systemFont(ofSize: 14)
+        textView.isScrollEnabled = false
         textView.contentSize.height = 0.0
         return textView
     }()
@@ -144,9 +144,9 @@ class FeedCell: UICollectionViewCell {
     let statusImageView : UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "")
-        imageView.contentMode = .ScaleAspectFill
+        imageView.contentMode = .scaleAspectFill
         imageView.layer.masksToBounds = true
-        imageView.userInteractionEnabled = true
+        imageView.isUserInteractionEnabled = true
         return imageView
     }()
     
@@ -154,7 +154,7 @@ class FeedCell: UICollectionViewCell {
     let likesLabel: UILabel = {
         let label = UILabel()
         label.text = ""
-        label.font = UIFont.systemFontOfSize(12)
+        label.font = UIFont.systemFont(ofSize: 12)
         label.textColor = UIColor.rgb(155, green: 161, blue: 161)
         //label.backgroundColor = UIColor.greenColor()
         return label
@@ -162,8 +162,8 @@ class FeedCell: UICollectionViewCell {
     let commentSharesLabel: UILabel = {
         let label = UILabel()
         label.text = ""
-        label.font = UIFont.systemFontOfSize(12)
-        label.textAlignment = NSTextAlignment.Right
+        label.font = UIFont.systemFont(ofSize: 12)
+        label.textAlignment = NSTextAlignment.right
         label.textColor = UIColor.rgb(155, green: 161, blue: 161)
         //label.backgroundColor = UIColor.greenColor()
         return label
@@ -181,14 +181,14 @@ class FeedCell: UICollectionViewCell {
     let shareButton: UIButton = FeedCell.buttonForTitle("Share", imageName: "share")
     
     
-    static func buttonForTitle(title: String, imageName: String) -> UIButton{
+    static func buttonForTitle(_ title: String, imageName: String) -> UIButton{
         let button = UIButton()
-        button.setTitle(title, forState: .Normal)
-        button.setTitleColor(UIColor.rgb(143, green: 150, blue: 163), forState: .Normal)
+        button.setTitle(title, for: UIControlState())
+        button.setTitleColor(UIColor.rgb(143, green: 150, blue: 163), for: UIControlState())
         
-        button.setImage(UIImage(named:imageName), forState: .Normal)
+        button.setImage(UIImage(named:imageName), for: UIControlState())
         button.titleEdgeInsets = UIEdgeInsetsMake(0, 8, 0, 0)
-        button.titleLabel?.font = UIFont.boldSystemFontOfSize(14)
+        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 14)
         //button.backgroundColor = UIColor.blueColor()
         return button
     }
@@ -205,7 +205,7 @@ class FeedCell: UICollectionViewCell {
     
     
     func setupViews(){
-        backgroundColor = UIColor.whiteColor()
+        backgroundColor = UIColor.white
         
         addSubview(nameLabel)
         addSubview(profileImageView)
@@ -249,12 +249,12 @@ class FeedCell: UICollectionViewCell {
         
     }
     
-    let loader = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
+    let loader = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
     
     func setupStatusImageViewLoader() {
         loader.hidesWhenStopped = true
         loader.startAnimating()
-        loader.color = UIColor.blackColor()
+        loader.color = UIColor.black
         statusImageView.addSubview(loader)
         statusImageView.addConstraintsWithFormat("H:|[v0]|", views: loader)
         statusImageView.addConstraintsWithFormat("V:|[v0]|", views: loader)

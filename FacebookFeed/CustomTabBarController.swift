@@ -38,11 +38,11 @@ class CustomTabBarController: UITabBarController {
         
         viewControllers = [navigationController, secondNavigationController, messageNavigationController, notificationsNavController, moreNavController]
         
-        tabBar.translucent = false
+        tabBar.isTranslucent = false
         
         let topBorder = CALayer()
-        topBorder.frame = CGRectMake(0,0,100,0.5)
-        topBorder.backgroundColor = UIColor.rgb(229, green: 231, blue: 235).CGColor
+        topBorder.frame = CGRect(x: 0,y: 0,width: 100,height: 0.5)
+        topBorder.backgroundColor = UIColor.rgb(229, green: 231, blue: 235).cgColor
         
         tabBar.clipsToBounds = true
     }

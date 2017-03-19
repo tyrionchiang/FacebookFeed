@@ -25,8 +25,8 @@ class FeedController: UICollectionViewController, UICollectionViewDelegateFlowLa
 //        posts.append(postTyrion)
         let memoryCapacity = 500 * 1024 * 1024
         let diskCapacity = 500 * 1024 * 1024
-        let urlCache = NSURLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: "myDiskPath")
-        NSURLCache.setSharedURLCache(urlCache)
+        let urlCache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: "myDiskPath")
+        URLCache.shared = urlCache
         
         
         navigationItem.title = "Facebook Feed"
@@ -35,16 +35,16 @@ class FeedController: UICollectionViewController, UICollectionViewDelegateFlowLa
         
         collectionView?.backgroundColor = UIColor(white: 0.95, alpha: 1)
         
-        collectionView?.registerClass(FeedCell.self, forCellWithReuseIdentifier: CellId)
+        collectionView?.register(FeedCell.self, forCellWithReuseIdentifier: CellId)
         // Do any additional setup after loading the view, typically from a nib.
     }
 
-    override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return posts.numberOfPosts()
     }
     
-    override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let feedCell = collectionView.dequeueReusableCellWithReuseIdentifier(CellId, forIndexPath: indexPath) as! FeedCell
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let feedCell = collectionView.dequeueReusableCell(withReuseIdentifier: CellId, for: indexPath) as! FeedCell
         
         feedCell.post = posts[indexPath]
         feedCell.feedController = self
@@ -52,23 +52,23 @@ class FeedController: UICollectionViewController, UICollectionViewDelegateFlowLa
         return feedCell
     }
 
-    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         if let statusText = posts[indexPath].statusText{
             
-            let rect = NSString(string: statusText).boundingRectWithSize(CGSizeMake(view.frame.width, 1000), options: NSStringDrawingOptions.UsesFontLeading.union(NSStringDrawingOptions.UsesLineFragmentOrigin), attributes: [NSFontAttributeName: UIFont.systemFontOfSize(14)], context: nil)
+            let rect = NSString(string: statusText).boundingRect(with: CGSize(width: view.frame.width, height: 1000), options: NSStringDrawingOptions.usesFontLeading.union(NSStringDrawingOptions.usesLineFragmentOrigin), attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 14)], context: nil)
             
             let knownHeight: CGFloat = 8 + 44 + 4 + 4 + 200 + 8 + 24  + 8 + 44
 
             
-            return CGSizeMake(view.frame.width, rect.height + knownHeight + 24)
+            return CGSize(width: view.frame.width, height: rect.height + knownHeight + 24)
         }
         
-        return CGSizeMake(view.frame.width, 500)
+        return CGSize(width: view.frame.width, height: 500)
     }
     
-    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
         
         collectionView?.collectionViewLayout.invalidateLayout()
     }
@@ -84,51 +84,51 @@ class FeedController: UICollectionViewController, UICollectionViewDelegateFlowLa
     let tabBarCoverView = UIView()
     
     
-    func animateImageView(statusImageView: UIImageView){
+    func animateImageView(_ statusImageView: UIImageView){
         
         self.statusImageView = statusImageView
         
-        if let startingFram = statusImageView.superview?.convertRect(statusImageView.frame, toView: nil){
+        if let startingFram = statusImageView.superview?.convert(statusImageView.frame, to: nil){
             
             statusImageView.alpha = 0
             
             blackBackgroundView.frame = self.view.frame
-            blackBackgroundView.backgroundColor = UIColor.blackColor()
+            blackBackgroundView.backgroundColor = UIColor.black
             blackBackgroundView.alpha = 0
             view.addSubview(blackBackgroundView)
             
             
-            navBarCoverView.frame = CGRectMake(0, 0, 1000, 20 + 44)
-            navBarCoverView.backgroundColor = UIColor.blackColor()
+            navBarCoverView.frame = CGRect(x: 0, y: 0, width: 1000, height: 20 + 44)
+            navBarCoverView.backgroundColor = UIColor.black
             navBarCoverView.alpha = 0
             
             
-            if let keyWindow = UIApplication.sharedApplication().keyWindow{
+            if let keyWindow = UIApplication.shared.keyWindow{
                 keyWindow.addSubview(navBarCoverView)
                 
-                tabBarCoverView.frame = CGRectMake(0, keyWindow.frame.height - 49, 1000, 49)
-                tabBarCoverView.backgroundColor = UIColor.blackColor()
+                tabBarCoverView.frame = CGRect(x: 0, y: keyWindow.frame.height - 49, width: 1000, height: 49)
+                tabBarCoverView.backgroundColor = UIColor.black
                 tabBarCoverView.alpha = 0
                 keyWindow.addSubview(tabBarCoverView)
 
             }
             
             
-            zoomImageView.backgroundColor = UIColor.redColor()
+            zoomImageView.backgroundColor = UIColor.red
             zoomImageView.frame = startingFram
-            zoomImageView.userInteractionEnabled = true
+            zoomImageView.isUserInteractionEnabled = true
             zoomImageView.image = statusImageView.image
-            zoomImageView.contentMode = .ScaleAspectFill
+            zoomImageView.contentMode = .scaleAspectFill
             zoomImageView.clipsToBounds = true
             view.addSubview(zoomImageView)
             
             zoomImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.zoomOut)))
             
             
-            UIView.animateWithDuration(0.75, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .CurveEaseOut, animations: {() -> Void in
+            UIView.animate(withDuration: 0.75, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseOut, animations: {() -> Void in
                 let height = startingFram.height * self.view.frame.width / startingFram.width
                 let y = ((self.view.frame.height - height) / 2 + 49)
-                self.zoomImageView.frame = CGRectMake(0, y, self.view.frame.width, height)
+                self.zoomImageView.frame = CGRect(x: 0, y: y, width: self.view.frame.width, height: height)
                 
                 self.blackBackgroundView.alpha = 1
                 
@@ -147,11 +147,11 @@ class FeedController: UICollectionViewController, UICollectionViewDelegateFlowLa
     }
     
     func zoomOut(){
-        if let startingFram = statusImageView!.superview?.convertRect(statusImageView!.frame, toView: nil){
+        if let startingFram = statusImageView!.superview?.convert(statusImageView!.frame, to: nil){
             
             
             
-            UIView.animateWithDuration(0.75, animations: {() -> Void in
+            UIView.animate(withDuration: 0.75, animations: {() -> Void in
                 self.zoomImageView.frame = startingFram
                 
                 self.blackBackgroundView.alpha = 0

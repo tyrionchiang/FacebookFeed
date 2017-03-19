@@ -24,7 +24,7 @@ class Post{
 }
 
 class  Posts {
-    private let postsList: [Post]
+    fileprivate let postsList: [Post]
     
     init(){
         let postRyuuu = Post()
@@ -36,20 +36,20 @@ class  Posts {
         postRyuuu.numLikes = 12000
         postRyuuu.numComments = 72
         postRyuuu.numShares = 3
-        postRyuuu.statusImageUrl = "https://s3-us-west-2.amazonaws.com/letsbuildthatapp/mark_zuckerberg_background.jpg"
+        postRyuuu.statusImageUrl = "https://scontent-tpe1-1.xx.fbcdn.net/v/t1.0-9/13529046_1916173278609349_1497144154296080933_n.jpg?oh=d39555b3d711b3592bf267b060485262&oe=596563EA"
         
         
         
         let postTyrion2 = Post()
         postTyrion2.name = "Tyrion Chiang"
         postTyrion2.postTime = "July 14"
-        postTyrion2.statusText = "翩若驚鴻，婉若遊龍，榮曜秋菊，華茂春松"
+        postTyrion2.statusText = "雞蛋餅～～!!!"
         postTyrion2.profileImageName = "tyrion"
         postTyrion2.statusImageName = "IMG_0859"
         postTyrion2.numLikes = 13
         postTyrion2.numComments = 7
         postTyrion2.numShares = 0
-        postTyrion2.statusImageUrl = "https://s3-us-west-2.amazonaws.com/letsbuildthatapp/steve_jobs_background.jpg"
+        postTyrion2.statusImageUrl = "https://scontent-tpe1-1.xx.fbcdn.net/v/t1.0-9/72345_1029032717143491_7416064736292759705_n.jpg?oh=c24bc4817af3364133448986bd9307b9&oe=592BB849"
 
         
         let postTyrion = Post()
@@ -106,7 +106,7 @@ class  Posts {
     func numberOfPosts() -> Int {
         return postsList.count
     }
-    subscript(indexPath: NSIndexPath) -> Post{
+    subscript(indexPath: IndexPath) -> Post{
         return postsList[indexPath.item]
     }
 }

@@ -11,7 +11,7 @@ import UIKit
 
 
 extension String{
-    static func countLabelNumToString(num:Int) -> String{
+    static func countLabelNumToString(_ num:Int) -> String{
         var numString = ""
         
         if num > 0{
@@ -60,7 +60,7 @@ extension String{
 
 
 extension UIColor{
-    static func rgb(red: CGFloat, green: CGFloat, blue: CGFloat) -> UIColor{
+    static func rgb(_ red: CGFloat, green: CGFloat, blue: CGFloat) -> UIColor{
         return UIColor(red: red/255, green: green/255, blue: blue/255, alpha: 1.0)
         
     }
@@ -69,14 +69,14 @@ extension UIColor{
 
 extension UIView{
     
-    func addConstraintsWithFormat(format: String, views: UIView...){
+    func addConstraintsWithFormat(_ format: String, views: UIView...){
         var viewsDictionary = [String: UIView]()
-        for (index, view) in views.enumerate(){
+        for (index, view) in views.enumerated(){
             let key = "v\(index)"
             viewsDictionary[key] = view
             view.translatesAutoresizingMaskIntoConstraints = false
         }
-        addConstraints(NSLayoutConstraint.constraintsWithVisualFormat(format, options: NSLayoutFormatOptions(), metrics: nil, views: viewsDictionary))
+        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: format, options: NSLayoutFormatOptions(), metrics: nil, views: viewsDictionary))
         
     }
 }
